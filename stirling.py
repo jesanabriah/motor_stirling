@@ -1,9 +1,20 @@
 #!/usr/bin/env python2
 # -*- coding: utf-8 -*-
 """
-Created on Sat May 19 18:35:10 2018
+    Copyright 2018 Jorge Sanabria
+    
+    This program is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
 
-@author: jorge
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with this program.  If not, see <http://www.gnu.org/licenses/>.   
 """
 
 import matplotlib.pyplot as plt
@@ -12,61 +23,83 @@ import serial
 import threading
 import serial.tools.list_ports
 
-#Volumen
+#Historial de volumen
 h_v = []
-#Presión
+
+#Historial de presión
 h_p = []
-#Temperatura
-t = 0
 
-temp_p, temp_v, temp_t = [], [], 0
+#Temperatura y numero de vueltas
+t, n = 0, 0
 
+#Variables temporales
+temp_p, temp_v, temp_t, temp_n = [], [], 0, 0
+
+#M es la cantidad de muestras visibles en el plot y por tanto el tamaño de los arreglos
 M = 50
+
+#Un numero bastante grande para que la animacion nunca termine
 N = 100000
 
+#Lee los puertos seriales habilitados en el sistema
 comlist = serial.tools.list_ports.comports()
 connected = []
 
+#Revisa los puertos seriales conectados
 for element in comlist:
     connected.append(element.device)
 
+#Inicializa la comunicacion serial por el primer puerto habilitado
 arduino = serial.Serial(connected[0], 115200, timeout=0.005)
 
+#Esta funcion se ejecuta solo cuando inicia la animacion
 def init():
-    global h_v, h_p, t,temp_p, temp_v, temp_t
+    global h_p, h_v, t, n, temp_p, temp_v, temp_t, temp_n
     
+    #inicializa los arreglos con ceros
     h_v = [0] * M
     h_p = [0] * M
     t = 0
+    n = 0
     temp_p = [0] * M
     temp_v = [0] * M
     temp_t = 0
+    temp_n = 0
     
+    #Inicializa el plot
     line.set_data(h_v, h_p)
     return line,
 
+#Esta funcion se repite continuamente
 def animate(index, val,  line):
-    global h_p, h_v, t, temp_p, temp_v, temp_t
-
-    h_p, h_v, t = temp_p, temp_v, temp_t
+    global h_p, h_v, t, n, temp_p, temp_v, temp_t, temp_n
     
-    plt.title("T = " + str(t) + r"$^\circ C$")                
+    #Asigna los valores temporales leidos serialmente desde el usb, en el plot
+    h_p, h_v, t, n = temp_p, temp_v, temp_t, temp_n
+    
+    #Muestra la temperatura y grafica los datos
+    plt.title("T = " + str(t) + r"$^\circ C$ :: N = " + str(n))                
     line.set_data([h_v, h_p])
     return line,
 
+#Lee continuamente los datos desde el puerto serial USB
 def read_data():
-    global temp_p, temp_v, temp_t
+    global temp_p, temp_v, temp_t, temp_n
     while True:
-        data = arduino.readline()[:-2]
+        data = arduino.readline()[:-2]#Omite el fin de linea
         if data:
             try:
-                sp, sv, st = data.split(":")
+                #Lee cada dato del serial independientemente
+                sp, sv, st, sn = data.split(":")
                 if sp and sv and st:
+                    #Agrega un nuevo elemento al top del array
                     temp_p.append(float(sp))
-                    temp_v.append(float(sv) / 1023.0 * 45.2)
+                    temp_v.append(float(sv) / 1023.0 * 45.2)#Ajuste en cm^3
+                    #Borra el primer elemento del array, en cada caso
                     temp_p.pop(0)
                     temp_v.pop(0)
                     temp_t = float(st)
+                    temp_n = int(sn)
             except ValueError:
                 pass
 
@@ -83,8 +116,9 @@ plt.suptitle(u"Diagrama PV de maquina térmica")
 #plt.xticks([i for i in range(-TAM,TAM)])
 #plt.yticks([i for i in range(-TAM,TAM)])
 plt.grid()
-plt.xlim(18, 28)
-plt.ylim(600, 920)
+#Modificar estos valores de acuerdo a las necesidades del plot
+plt.xlim(0, 45.2)
+plt.ylim(300, 1100)
 plt.xlabel(r"$V\, / \,[cm^3]$")
 plt.ylabel(r"$P\, / \,[hPa]$")
 
