@@ -108,3 +108,7 @@ venv.bak/
 *.lyx
 *.csv
 *.ods
+*.bib
+*.pdf
+*.jpg
+*.lyx~
