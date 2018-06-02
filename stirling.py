@@ -103,21 +103,20 @@ def read_data():
             except ValueError:
                 pass
 
-# Read data
+# Crea un hilo de ejecucion exclusivo para la lectura de los datos seriales
 t_read_data = threading.Thread(target=read_data)
 t_read_data.start()
 
-# Plot
+# Plot animacion
 fig = plt.figure()
 line,  = plt.plot([], [], '-')
-#plt.axis("scaled")
-#plt.axis("off")
 plt.suptitle(u"Diagrama PV de maquina térmica")
-#plt.xticks([i for i in range(-TAM,TAM)])
-#plt.yticks([i for i in range(-TAM,TAM)])
 plt.grid()
+
 #Modificar estos valores de acuerdo a las necesidades del plot
+#45.2 cm^3 es el mayor valor leido posible por el desplazamiento maximo del sensor
 plt.xlim(0, 45.2)
+#El sensor BMP180 tiene un rango de medicion para la presion entre 300 y 1100 hPa, segun el fabricante
 plt.ylim(300, 1100)
 plt.xlabel(r"$V\, / \,[cm^3]$")
 plt.ylabel(r"$P\, / \,[hPa]$")
@@ -132,6 +131,9 @@ plt.ylabel(r"$P\, / \,[hPa]$")
 # retornando en "anim" es posible guardar la animacion posteriormente
 anim = animation.FuncAnimation(fig, animate, range(N + 1),  fargs=(0,  line), interval = 100,  init_func=init,  repeat = False,  blit=False)
 
-#anim.save('maquina_termica.mp4', fps=100, extra_args=['-vcodec', 'libx264'])
+# La siguiente linea puede no comentarla para guardar un video con el registro de las medidas respectivas.
+# Puede llegar a ser bastante lento dependiendo del tiempo de ejecución y de la velocidad de procesamiento 
+# del computador utilizado.
+#anim.save('stirling.mp4', fps=100, extra_args=['-vcodec', 'libx264'])
 
 plt.show()
