@@ -10,3 +10,7 @@ En el archivo Fritzing_Sketch.fzz podra encontrar un diagrama esquematico del ci
 En el proyecto fue usado el Arduino Mega 2560, sin embargo en general puede servir cualquier Arduino siempre y cuando este tenga las entradas SCL y SDA correspondientes al bus de comunicación serial I2c. Puede encontrar este por ejemplo en Arduino Nano, Arduino Uno, Arduino Mega, etc.
 
 Para la comunicación serial con el computador se ha hecho uso del puerto USB que viene integrado con la placa de Arduino y el sistema se comunica siempre en el primer puerto que encuentra habilitado y conectado. Puede cambiar esto último en el código Python correspondiente.
+
+Es posible ver en YouTube un video donde se muestra el montaje final en funcionamiento, en una versión previa a la versión final en este repositorio.
+
+Vealo en YouTube: https://youtu.be/jGdUpJQKsvk
