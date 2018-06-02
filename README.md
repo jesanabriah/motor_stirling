@@ -14,3 +14,5 @@ Para la comunicación serial con el computador se ha hecho uso del puerto USB qu
 Es posible ver en YouTube un video donde se muestra el montaje final en funcionamiento, en una versión previa a la versión final en este repositorio.
 
 Vealo en YouTube: https://youtu.be/jGdUpJQKsvk
+
+@author: Jorge Sanabria
